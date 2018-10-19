@@ -21,6 +21,7 @@ DATA_HUSER=2
 DATA_HADDR=3
 DATA_HPORT=4
 PING_DEFAULT_TTL=20
+NC_DEFAULT_TTL=2
 SSH_DEFAULT_PORT=22
 
 #================== Functions ================================================
@@ -28,10 +29,13 @@ SSH_DEFAULT_PORT=22
 function exec_ping() {
 	case $(uname) in 
 		MINGW*)
-			ping -n 1 -i $PING_DEFAULT_TTL $@
+			ping -n 1 -i $PING_DEFAULT_TTL $1
+			;;
+		Darwin*)
+			nc -z -G$NC_DEFAULT_TTL -w$NC_DEFAULT_TTL $@ > /dev/null 2>&1
 			;;
 		*)
-			ping -c1 -t$PING_DEFAULT_TTL $@
+			ping -c1 -t$PING_DEFAULT_TTL $1
 			;;
 	esac
 }
@@ -145,7 +149,7 @@ if [ $# -eq 0 ]; then
 	separator
 	while IFS=: read label user ip port         
 	do    
-	test_host $ip
+	test_host $ip $port
 	echo -ne "\t"
 	cecho -n -blue $label
 	echo -ne ' ==> '
@@ -212,3 +216,4 @@ case "$cmd" in
 		exit 1
 		;;
 esac
+
