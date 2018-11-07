@@ -149,6 +149,9 @@ if [ $# -eq 0 ]; then
 	separator
 	while IFS=: read label user ip port         
 	do    
+	if [ "$port" == "" ]; then
+		port=$SSH_DEFAULT_PORT
+	fi
 	test_host $ip $port
 	echo -ne "\t"
 	cecho -n -blue $label
@@ -157,9 +160,6 @@ if [ $# -eq 0 ]; then
 	cecho -n -yellow "@"
 	cecho -n -white $ip
 	echo -ne ' -> '
-	if [ "$port" == "" ]; then
-		port=$SSH_DEFAULT_PORT
-	fi
 	cecho -yellow $port
 	echo
 done < $HOST_FILE
