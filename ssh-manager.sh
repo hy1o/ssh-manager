@@ -20,6 +20,7 @@ DATA_ALIAS=1
 DATA_HUSER=2
 DATA_HADDR=3
 DATA_HPORT=4
+DATA_OPT=5
 PING_DEFAULT_TTL=20
 NC_DEFAULT_TTL=2
 SSH_DEFAULT_PORT=22
@@ -61,10 +62,10 @@ function list_commands() {
 	separator
 	echo -e "Availables commands"
 	separator
-	echo -e "$0 cc\t<alias> [username]\t\tconnect to server"
-	echo -e "$0 add\t<alias>:<user>:<host>:[port]\tadd new server"
-	echo -e "$0 del\t<alias>\t\t\t\tdelete server"
-	echo -e "$0 export\t\t\t\t\texport config"
+	echo -e "$0 cc\t<alias> [username]\t\t\tconnect to server"
+	echo -e "$0 add\t<alias>:<user>:<host>:[port]:[options]\tadd new server"
+	echo -e "$0 del\t<alias>\t\t\t\t\tdelete server"
+	echo -e "$0 export\t\t\t\t\t\texport config"
 }
 
 function probe ()
@@ -96,6 +97,11 @@ function get_user ()
 {
 	als=$1
 	get_raw "$als" | awk -F "$DATA_DELIM" '{ print $'$DATA_HUSER' }'
+}
+function get_opt ()
+{
+	als=$1
+	get_raw "$als" | awk -F "$DATA_DELIM" '{ print $'$DATA_OPT' }'
 }
 function server_add() {
 	probe "$alias"
@@ -147,7 +153,7 @@ if [ $# -eq 0 ]; then
 	separator 
 	echo "List of availables servers for user $(whoami) "
 	separator
-	while IFS=: read label user ip port         
+	while IFS=: read label user ip port options
 	do    
 	if [ "$port" == "" ]; then
 		port=$SSH_DEFAULT_PORT
@@ -161,6 +167,7 @@ if [ $# -eq 0 ]; then
 	cecho -n -white $ip
 	echo -ne ' -> '
 	cecho -yellow $port
+	echo -ne ' ' $options
 	echo
 done < $HOST_FILE
 
@@ -179,12 +186,13 @@ case "$cmd" in
 			fi
 			addr=$(get_addr "$alias")
 			port=$(get_port "$alias")
+			opt=$(get_opt "$alias")
 			# Use default port when parameter is missing
 			if [ "$port" == "" ]; then
 				port=$SSH_DEFAULT_PORT
 			fi
 			echo "connecting to '$alias' ($addr:$port)"
-			ssh $user@$addr -p $port
+			ssh $user@$addr -p $port $opt
 		else
 			echo "$0: unknown alias '$alias'"
 			exit 1
