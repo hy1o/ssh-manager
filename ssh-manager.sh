@@ -21,7 +21,7 @@ DATA_HUSER=2
 DATA_HADDR=3
 DATA_HPORT=4
 DATA_OPT=5
-PING_DEFAULT_TTL=20
+PING_DEFAULT_TTL=2
 NC_DEFAULT_TTL=2
 SSH_DEFAULT_PORT=22
 
@@ -34,6 +34,9 @@ function exec_ping() {
 			;;
 		Darwin*)
 			nc -z -G$NC_DEFAULT_TTL -w$NC_DEFAULT_TTL $@ > /dev/null 2>&1
+			;;
+		Linux*)
+			nc -z -w$NC_DEFAULT_TTL $@ > /dev/null 2>&1
 			;;
 		*)
 			ping -c1 -t$PING_DEFAULT_TTL $1
