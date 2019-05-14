@@ -24,6 +24,7 @@ DATA_OPT=5
 PING_DEFAULT_TTL=20
 NC_DEFAULT_TTL=2
 SSH_DEFAULT_PORT=22
+DEBUG=0
 
 #================== Functions ================================================
 
@@ -77,8 +78,8 @@ function probe ()
 
 function get_raw ()
 {
-	als=$1
-	grep -w -e $als $HOST_FILE 2> /dev/null
+	als="$1:"
+	grep -e $als $HOST_FILE 2> /dev/null
 }
 
 function get_addr ()
@@ -188,6 +189,13 @@ case "$cmd" in
 			port=$(get_port "$alias")
 			opt=$(get_opt "$alias")
 			# Use default port when parameter is missing
+			if [ "$DEBUG" == "1" ]; then
+			    echo "alias: $alias"
+			    echo "user: $user"
+			    echo "addr: $addr"
+			    echo "port: $port"
+			    echo "opt: $opt"
+			fi
 			if [ "$port" == "" ]; then
 				port=$SSH_DEFAULT_PORT
 			fi
