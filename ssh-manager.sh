@@ -82,7 +82,7 @@ function probe ()
 function get_raw ()
 {
 	als="$1:"
-	grep -e $als $HOST_FILE 2> /dev/null
+	grep -e $als $HOST_FILE | grep -v "#" 2> /dev/null
 }
 
 function get_addr ()
